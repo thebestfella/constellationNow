@@ -1,0 +1,67 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "And",
+      "properties": {
+        "name": "Andromeda",
+        "desig": "And",
+        "gen": "Andromedae",
+        "rank": "1",
+        "en": "Andromeda",
+        "la": "Andromeda",
+        "ar": "المرأة المسلسلة",
+        "zh": "仙女座",
+        "cz": "Andromeda",
+        "fa": "زن به زنجیر بسته",
+        "ee": "Andromeeda",
+        "fi": "Andromeda",
+        "fr": "Andromède",
+        "de": "Andromeda",
+        "gr": "Ανδρομέδα",
+        "it": "Andromeda",
+        "ja": "アンドロメダ座",
+        "ko": "안드로메다자리",
+        "hi": "देवयानी",
+        "ru": "Андромеда",
+        "es": "Andrómeda",
+        "tr": "Andromeda",
+        "he": "אנדרומדה",
+        "display": [-350, 37, 115]
+      },
+      "geometry": { "type": "Point", "coordinates": [0.75, 43] }
+    },
+    {
+      "type": "Feature",
+      "id": "Ant",
+      "properties": {
+        "name": "Antlia",
+        "desig": "Ant",
+        "gen": "Antliae",
+        "rank": "3",
+        "en": "Air Pump",
+        "la": "Antlia",
+        "ar": "مفرغة الهواء",
+        "zh": "唧筒座",
+        "cz": "Vývěva",
+        "fa": "تلمبه",
+        "ee": "Pump",
+        "fi": "Ilmapumppu",
+        "fr": "Machine Pneumatique",
+        "de": "Luftpumpe",
+        "gr": "Αντλία",
+        "it": "Macchina Pneumatica",
+        "ja": "ポンプ座",
+        "ko": "공기펌프자리",
+        "hi": "वाताकर्षक",
+        "ru": "Насос",
+        "es": "Máquina Neumática",
+        "tr": "Pompa",
+        "he": "משאבה",
+        "display": [154.1067, -32.4836, 60]
+      },
+      "geometry": { "type": "Point", "coordinates": [156, -36] }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+.line {
+  fill: none;
+  /* starts invisible, made visible with transition */
+  stroke: white;
+  /* half is inside the margin, half is outside */
+  stroke-width: 1px;
+}
+
+rect {
+  fill: none;
+  stroke: black;
+  /* half is inside the margin, half is outside */
+  stroke-width: 1px;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
