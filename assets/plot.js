@@ -11,8 +11,15 @@
 
 //css
 
-var outerWidth = 900,
-  outerHeight = 900; // includes margins
+// Define the div for the tooltip
+var div = d3
+  .select("body")
+  .append("div")
+  .attr("class", "tooltip")
+  .style("opacity", 0);
+
+var outerWidth = 360 * 4,
+  outerHeight = 180 * 4; // includes margins
 
 var margin = { top: 100, right: 20, bottom: 80, left: 80 }; // clockwise as in CSS
 
@@ -21,7 +28,49 @@ var width = outerWidth - margin.left - margin.right, // width of plot inside mar
 
 document.body.style.margin = "0px"; // Eliminate default margin from <body> element
 
-// console.log(fullData);
+let fullDataName = [];
+let fullDataClean = [];
+let fullDataFlat = [];
+
+fullData.forEach((i) => {
+  let a = [];
+
+  i.geometry.coordinates.forEach((j) => {
+    let b = [];
+    j.forEach((k) => {
+      b.push({ x: -k[0], y: k[1] });
+      fullDataFlat.push({ x: -k[0], y: k[1] });
+    });
+    //console.log(j);
+    a.push(b);
+  });
+
+  fullDataName.push(i.id);
+  fullDataClean.push(a);
+});
+
+//let fullDataFlat = fullDataClean.flat();
+
+// let coordinates = [
+//   [
+//     [93.7194, 22.5068],
+//     [95.7401, 22.5136],
+//     [100.983, 25.1311],
+//     [107.7849, 30.2452],
+//     [113.6494, 31.8883],
+//     [116.329, 28.0262],
+//     [113.9806, 26.8957],
+//     [110.0307, 21.9823],
+//     [106.0272, 20.5703],
+//     [99.4279, 16.3993],
+//     [101.3224, 12.8956],
+//   ],
+//   [
+//     [110.0307, 21.9823],
+//     [109.5232, 16.5404],
+//   ],
+// ];
+// let coord = [];
 // coordinates.forEach((element) => {
 //   let x = [];
 //   element.forEach((inner) => {
@@ -29,47 +78,15 @@ document.body.style.margin = "0px"; // Eliminate default margin from <body> elem
 //   });
 //   coord.push(x);
 // });
-
-var coordinates = [
-  [
-    [93.7194, 22.5068],
-    [95.7401, 22.5136],
-    [100.983, 25.1311],
-    [107.7849, 30.2452],
-    [113.6494, 31.8883],
-    [116.329, 28.0262],
-    [113.9806, 26.8957],
-    [110.0307, 21.9823],
-    [106.0272, 20.5703],
-    [99.4279, 16.3993],
-    [101.3224, 12.8956],
-  ],
-  [
-    [110.0307, 21.9823],
-    [109.5232, 16.5404],
-  ],
-];
-
-let coord = [];
-
-coordinates.forEach((element) => {
-  let x = [];
-  element.forEach((inner) => {
-    x.push({ x: -inner[0], y: inner[1] });
-  });
-  coord.push(x);
-});
-
-let coord_flat = coord.flat();
-
-var data = [
-  { x: 0, y: 0 },
-  { x: 1, y: 30 },
-  { x: 2, y: 40 },
-  { x: 3, y: 20 },
-  { x: 4, y: 90 },
-  { x: 5, y: 70 },
-];
+// let coord_flat = coord.flat();
+// var data = [
+//   { x: 0, y: 0 },
+//   { x: 1, y: 30 },
+//   { x: 2, y: 40 },
+//   { x: 3, y: 20 },
+//   { x: 4, y: 90 },
+//   { x: 5, y: 70 },
+// ];
 
 function xValue(d) {
   return d.x;
@@ -80,12 +97,14 @@ function yValue(d) {
 
 var x = d3.scale
   .linear() // interpolator for X axis -- inner plot region
-  .domain(d3.extent(coord_flat, xValue))
+  //.domain(d3.extent(fullDataFlat, xValue))
+  .domain([-220, 190])
   .range([0, width]);
 
 var y = d3.scale
   .linear() // interpolator for Y axis -- inner plot region
-  .domain(d3.extent(coord_flat, yValue))
+  //.domain(d3.extent(fullDataFlat, yValue))
+  .domain([-90, 90])
   .range([height, 0]); // remember, (0,0) is upper left -- this reverses "y"
 
 var line = d3.svg
@@ -100,13 +119,13 @@ var line = d3.svg
 var xAxis = d3.svg
   .axis() // x Axis
   .scale(x)
-  //.ticks(5) // request 5 ticks on the x axis
+  .ticks(9) // request 5 ticks on the x axis
   .orient("bottom");
 
 var yAxis = d3.svg
   .axis() // y Axis
   .scale(y)
-  // .ticks(4)
+  .ticks(6)
   .orient("left");
 
 var svg = d3
@@ -168,11 +187,13 @@ g.append("text") // plot title
 //   .attr("transform", "rotate(-90)")
 //   .text("outer y-axis label");
 
-coord.forEach((element) => {
-  g.append("path") // plot the data as a line
-    .datum(element)
-    .attr("class", "line")
-    .attr("d", line);
+fullDataClean.forEach((i) => {
+  i.forEach((j) => {
+    g.append("path") // plot the data as a line
+      .datum(j)
+      .attr("class", "line")
+      .attr("d", line);
+  });
 });
 
 g.append("rect") // plot a rectangle that encloses the inner plot area
@@ -193,7 +214,7 @@ g.append("rect") // plot a rectangle that encloses the inner plot area
 //   .attr("r", 10);
 
 g.selectAll(".dot") // plot a circle at each data location
-  .data(coord_flat)
+  .data(fullDataFlat)
   .enter()
   .append("circle")
   .attr("class", "dot")
@@ -203,7 +224,20 @@ g.selectAll(".dot") // plot a circle at each data location
   .attr("cy", function (d) {
     return y(d.y);
   })
-  .attr("r", 5);
+  .attr("r", 2)
+  .on("mouseover", function (d) {
+    div.transition().duration(200).style("opacity", 0.9);
+    div
+      .html(d.x + " " + d.y)
+      .style("left", d3.event.pageX + "px")
+      .style("top", d3.event.pageY - 28 + "px");
+  })
+  .on("mouseout", function (d) {
+    div.transition().duration(0).style("opacity", 0);
+  });
+
+//d3 hoover
+//https://bl.ocks.org/d3noob/a22c42db65eb00d4e369
 
 // svg
 //   .append("rect") // plot a rectangle that encloses the entire SVG element
@@ -212,8 +246,18 @@ g.selectAll(".dot") // plot a circle at each data location
 //   .attr("width", outerWidth)
 //   .attr("height", outerHeight);
 
+// g.on({
+//   mouseover: function (d, i) {
+//     console.log(this, d, i);
+//     d3.select(this).style("cursor", "pointer");
+//   },
+//   mouseout: function (d) {
+//     d3.select(this).style("cursor", "");
+//   },
+// });
+
 d3.selectAll("path")
   .transition() // data transition
   .style("stroke", "steelblue")
-  .delay(000)
-  .duration(000);
+  .delay(1000)
+  .duration(2000);

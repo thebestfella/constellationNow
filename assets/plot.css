@@ -1,7 +1,7 @@
 .line {
   fill: none;
   /* starts invisible, made visible with transition */
-  stroke: white;
+  stroke: green;
   /* half is inside the margin, half is outside */
   stroke-width: 1px;
 }
@@ -18,4 +18,17 @@ rect {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
+}
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 60px;
+  height: 28px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
 }
