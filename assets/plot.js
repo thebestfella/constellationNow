@@ -30,14 +30,47 @@
 //simple xy
 //http://bl.ocks.org/pbogden/7562151/681d8b7fe71fc79c72e6ab206344c09d893a2f60
 
+//point transition
+//https://bl.ocks.org/guilhermesimoes/15ed216d14175d8165e6
+
+let zoomAnimation = 2000; //ms
+
 let buttonIn = document.querySelector(".buttonIn");
 let buttonOut = document.querySelector(".buttonOut");
 buttonIn.addEventListener("click", zoomIn);
 buttonOut.addEventListener("click", zoomOut);
 
-function zoomIn(e) {}
+function zoomIn(e) {
+  let scaleX = d3.scaleLinear().domain([-50, 50]).range([0, width]);
+  let scaleY = d3.scaleLinear().domain([-40, 40]).range([height, 0]);
 
-function zoomOut(e) {}
+  domXAxis.transition().duration(zoomAnimation).call(d3.axisBottom(scaleX));
+  // .duration(this.animationDuration)
+  domYAxis.transition().duration(zoomAnimation).call(d3.axisLeft(scaleY));
+  // .duration(this.animationDuration)
+
+  dots
+    .transition()
+    .duration(zoomAnimation)
+    .attr("cx", (d) => scaleX(d.x))
+    .attr("cy", (d) => scaleY(d.y));
+}
+
+function zoomOut(e) {
+  //set scale
+  let scaleX = d3.scaleLinear().domain([-230, 230]).range([0, width]);
+  let scaleY = d3.scaleLinear().domain([-100, 100]).range([height, 0]);
+
+  domXAxis.transition().duration(zoomAnimation).call(d3.axisBottom(scaleX));
+  domYAxis.transition().duration(zoomAnimation).call(d3.axisLeft(scaleY));
+  // .duration(this.animationDuration)
+
+  dots
+    .transition()
+    .duration(zoomAnimation)
+    .attr("cx", (d) => scaleX(d.x))
+    .attr("cy", (d) => scaleY(d.y));
+}
 
 // Define the div for the tooltip
 var div = d3
@@ -64,19 +97,6 @@ function xValue(d) {
 function yValue(d) {
   return d.y;
 }
-
-var x = d3
-  .scaleLinear() // interpolator for X axis -- inner plot region
-  //.domain(d3.extent(fullDataFlat, xValue))
-  .domain([-230, 230])
-  .range([0, width]);
-
-var y = d3
-  .scaleLinear() // interpolator for Y axis -- inner plot region
-  //.domain(d3.extent(fullDataFlat, yValue))
-  .domain([-100, 100])
-  .range([height, 0]); // remember, (0,0) is upper left -- this reverses "y"
-
 var line = d3
   .line() // SVG line generator
   .x(function (d) {
@@ -86,30 +106,41 @@ var line = d3
     return y(d.y);
   });
 
-var xAxis = d3.axisBottom(x);
-
-var yAxis = d3.axisLeft(y);
+console.log(x);
 
 var svg = d3
   .select(".d3Area")
   .append("svg")
   .attr("width", outerWidth)
   .attr("height", outerHeight); // Note: ok to leave this without units, implied "px"
-
 d3.select(".d3Area").attr("align", "center");
 
 var g = svg
   .append("g") // <g> element is the inner plot area (i.e., inside the margins)
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-g.append("g") // render the Y axis in the inner plot area
+var y = d3
+  .scaleLinear() // interpolator for Y axis -- inner plot region
+  //.domain(d3.extent(fullDataFlat, yValue))
+  .domain([-100, 100])
+  .range([height, 0]); // remember, (0,0) is upper left -- this reverses "y"
+let vertAxis = d3.axisLeft(y);
+let domYAxis = g
+  .append("g") // render the Y axis in the inner plot area
   .attr("class", "y axis")
-  .call(yAxis);
+  .call(vertAxis);
 
-g.append("g") // render the X axis in the inner plot area
+var x = d3
+  .scaleLinear() // interpolator for X axis -- inner plot region
+  //.domain(d3.extent(fullDataFlat, xValue))
+  .domain([-230, 230])
+  .range([0, width]);
+let horiAxis = d3.axisBottom(x);
+let domXAxis = g
+  .append("g") // render the X axis in the inner plot area
   .attr("class", "x axis")
   .attr("transform", "translate(0," + height + ")") // axis runs along lower part of graph
-  .call(xAxis);
+  .call(horiAxis);
 
 g.append("rect") // plot a rectangle that encloses the inner plot area
   .attr("width", width)
@@ -117,6 +148,7 @@ g.append("rect") // plot a rectangle that encloses the inner plot area
   .attr("height", height);
 // .attr("fill", none);
 
+//all line
 fullDataClean.forEach((item) => {
   item.data.forEach((j) => {
     g.append("path") // plot the data as a line
@@ -149,22 +181,18 @@ fullDataClean.forEach((item) => {
   });
 });
 
-g.selectAll(".dot") // plot a circle at each data location
+//all dots
+let dots = g
+  .selectAll(".dot") // plot a circle at each data location
   .data(fullDataFlat)
   .enter()
   .append("circle")
   .attr("r", (d, i) => (i % 3) + 1)
   .attr("stroke-width", (d, i) => 4 * (i % 3) + 3)
-  .attr("class", (d, i) => {
-    return "dot " + fullDataFlatByID[i];
-  })
+  .attr("class", (d, i) => "dot " + fullDataFlatByID[i])
   .attr("data-id", (d, i) => fullDataFlatByID[i])
-  .attr("cx", function (d) {
-    return x(d.x);
-  })
-  .attr("cy", function (d) {
-    return y(d.y);
-  })
+  .attr("cx", (d) => x(d.x))
+  .attr("cy", (d) => y(d.y))
   .on("mouseover", function (d) {
     //console.log(this.dataset.id);
     d3.selectAll("." + this.dataset.id)
