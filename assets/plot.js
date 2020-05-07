@@ -6,13 +6,23 @@
 //[x]get the right coord
 //[x]plot
 //[ ]css
-//  [ ]background
-//  [ ]line color
-//  [ ]hoover animation
+//  [x]background
+//  [x]line color
+//  [x]hoover animation
+//  [ ]add class list when point hoover over
 //[ ]work on global roate screen to deal with "Hya"
 //[ ]rotate with keyboard
 //[ ]click sound
-//
+//[ ]add cht name
+
+//check api
+//https://ofrohn.github.io/celestial-demo/viewer.html
+//check color
+//https://observablehq.com/@mbostock/star-map
+//tooltip
+//https://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+//simple xy
+//http://bl.ocks.org/pbogden/7562151/681d8b7fe71fc79c72e6ab206344c09d893a2f60
 
 // Define the div for the tooltip
 var div = d3
@@ -21,8 +31,10 @@ var div = d3
   .attr("class", "tooltip")
   .style("opacity", 0);
 
-var outerWidth = 360 * 4,
-  outerHeight = 180 * 4; // includes margins
+let size = 6;
+
+var outerWidth = 360 * size,
+  outerHeight = 220 * size; // includes margins
 
 var margin = { top: 100, right: 20, bottom: 80, left: 80 }; // clockwise as in CSS
 
@@ -30,66 +42,6 @@ var width = outerWidth - margin.left - margin.right, // width of plot inside mar
   height = outerHeight - margin.top - margin.bottom; // height   "     "
 
 document.body.style.margin = "0px"; // Eliminate default margin from <body> element
-
-let fullDataName = [];
-let fullDataClean = [];
-let fullDataFlat = [];
-
-fullData.forEach((i) => {
-  let a = [];
-
-  i.geometry.coordinates.forEach((j) => {
-    let b = [];
-    j.forEach((k) => {
-      b.push({ x: -k[0], y: k[1] });
-      fullDataFlat.push({ x: -k[0], y: k[1] });
-    });
-    //console.log(j);
-    a.push(b);
-  });
-
-  fullDataName.push(i.id);
-  fullDataClean.push(a);
-});
-
-//let fullDataFlat = fullDataClean.flat();
-
-// let coordinates = [
-//   [
-//     [93.7194, 22.5068],
-//     [95.7401, 22.5136],
-//     [100.983, 25.1311],
-//     [107.7849, 30.2452],
-//     [113.6494, 31.8883],
-//     [116.329, 28.0262],
-//     [113.9806, 26.8957],
-//     [110.0307, 21.9823],
-//     [106.0272, 20.5703],
-//     [99.4279, 16.3993],
-//     [101.3224, 12.8956],
-//   ],
-//   [
-//     [110.0307, 21.9823],
-//     [109.5232, 16.5404],
-//   ],
-// ];
-// let coord = [];
-// coordinates.forEach((element) => {
-//   let x = [];
-//   element.forEach((inner) => {
-//     x.push({ x: -inner[0], y: inner[1] });
-//   });
-//   coord.push(x);
-// });
-// let coord_flat = coord.flat();
-// var data = [
-//   { x: 0, y: 0 },
-//   { x: 1, y: 30 },
-//   { x: 2, y: 40 },
-//   { x: 3, y: 20 },
-//   { x: 4, y: 90 },
-//   { x: 5, y: 70 },
-// ];
 
 function xValue(d) {
   return d.x;
@@ -150,6 +102,132 @@ g.append("g") // render the X axis in the inner plot area
   .attr("transform", "translate(0," + height + ")") // axis runs along lower part of graph
   .call(xAxis);
 
+g.append("text") // plot title
+  .attr("class", "x label")
+  .attr("text-anchor", "middle")
+  .attr("x", width / 2)
+  .attr("y", -margin.top / 2)
+  .attr("dy", "+.75em")
+  .text("plot title");
+
+g.append("rect") // plot a rectangle that encloses the inner plot area
+  .attr("width", width)
+  .attr("width", width)
+  .attr("height", height);
+// .attr("fill", "pink");
+
+fullDataClean.forEach((item) => {
+  item.data.forEach((j) => {
+    g.append("path") // plot the data as a line
+      .datum(j)
+      .attr("class", (d, i) => {
+        return "line " + item.id;
+      })
+      .attr("d", line)
+      .attr("data-id", item.id)
+      .on("mouseover", function (d) {
+        console.log(this.dataset.id);
+        d3.selectAll("." + this.dataset.id)
+          .style("stroke", "salmon")
+          .style("stroke-opacity", "0.5");
+        div.transition().duration(200).style("opacity", 0.9);
+        div
+          //.html(d.x + " no " + d.y)
+          .html(this.dataset.id + " " + "fullname")
+          .style("left", d3.event.pageX + "px")
+          .style("top", d3.event.pageY - 28 + "px");
+      })
+      .on("mouseout", function (d) {
+        d3.selectAll("." + this.dataset.id)
+          .transition()
+          .style("stroke", "white")
+          .style("stroke-opacity", "0.1")
+          .duration(700);
+        div.transition().duration(0).style("opacity", 0);
+      });
+  });
+});
+
+g.selectAll(".dot") // plot a circle at each data location
+  .data(fullDataFlat)
+  .enter()
+  .append("circle")
+  .attr("class", (d, i) => {
+    return "dot " + fullDataFlatByID[i];
+  })
+  .attr("data-id", (d, i) => fullDataFlatByID[i])
+  .attr("cx", function (d) {
+    return x(d.x);
+  })
+  .attr("cy", function (d) {
+    return y(d.y);
+  })
+  .on("mouseover", function (d) {
+    //console.log(this.dataset.id);
+    d3.selectAll("." + this.dataset.id)
+      .style("stroke", "salmon")
+      .style("stroke-opacity", "0.5");
+    div.transition().duration(200).style("opacity", 0.9);
+    div
+      //.html(d.x + " no " + d.y)
+      .html(this.dataset.id + " " + "fullname")
+      .style("left", d3.event.pageX + "px")
+      .style("top", d3.event.pageY - 28 + "px");
+  })
+  .on("mouseout", function (d) {
+    d3.selectAll("." + this.dataset.id)
+      .transition()
+      .style("stroke", "white")
+      .style("stroke-opacity", "0.1")
+      .duration(700);
+    div.transition().duration(0).style("opacity", 0);
+  });
+
+// d3.selectAll("path")
+//   .transition() // data transition
+//   .style("stroke", "sienna")
+//   .delay(0)
+//   .duration(0);
+
+//let fullDataFlat = fullDataClean.flat();
+
+// let coordinates = [
+//   [
+//     [93.7194, 22.5068],
+//     [95.7401, 22.5136],
+//     [100.983, 25.1311],
+//     [107.7849, 30.2452],
+//     [113.6494, 31.8883],
+//     [116.329, 28.0262],
+//     [113.9806, 26.8957],
+//     [110.0307, 21.9823],
+//     [106.0272, 20.5703],
+//     [99.4279, 16.3993],
+//     [101.3224, 12.8956],
+//   ],
+//   [
+//     [110.0307, 21.9823],
+//     [109.5232, 16.5404],
+//   ],
+// ];
+// let coord = [];
+// coordinates.forEach((element) => {
+//   let x = [];
+//   element.forEach((inner) => {
+//     x.push({ x: -inner[0], y: inner[1] });
+//   });
+//   coord.push(x);
+// });
+// let coord_flat = coord.flat();
+// var data = [
+//   { x: 0, y: 0 },
+//   { x: 1, y: 30 },
+//   { x: 2, y: 40 },
+//   { x: 3, y: 20 },
+//   { x: 4, y: 90 },
+//   { x: 5, y: 70 },
+// ];
+
 // g.append("text") // inner x-axis label
 //   .attr("class", "x label")
 //   .attr("text-anchor", "end")
@@ -163,14 +241,6 @@ g.append("g") // render the X axis in the inner plot area
 //   .attr("x", width / 2)
 //   .attr("y", height + (2 * margin.bottom) / 3 + 6)
 //   .text("outer x-axis label");
-
-g.append("text") // plot title
-  .attr("class", "x label")
-  .attr("text-anchor", "middle")
-  .attr("x", width / 2)
-  .attr("y", -margin.top / 2)
-  .attr("dy", "+.75em")
-  .text("plot title");
 
 // g.append("text") // inner y-axis label
 //   .attr("class", "y label")
@@ -190,20 +260,6 @@ g.append("text") // plot title
 //   .attr("transform", "rotate(-90)")
 //   .text("outer y-axis label");
 
-fullDataClean.forEach((i) => {
-  i.forEach((j) => {
-    g.append("path") // plot the data as a line
-      .datum(j)
-      .attr("class", "line")
-      .attr("d", line);
-  });
-});
-
-g.append("rect") // plot a rectangle that encloses the inner plot area
-  .attr("width", width)
-  .attr("width", width)
-  .attr("height", height);
-
 // svg
 //   .append("circle") // plot a circle in the upper left of the SVG element
 //   .attr("cx", 0)
@@ -216,28 +272,7 @@ g.append("rect") // plot a rectangle that encloses the inner plot area
 //   .attr("cy", outerHeight)
 //   .attr("r", 10);
 
-g.selectAll(".dot") // plot a circle at each data location
-  .data(fullDataFlat)
-  .enter()
-  .append("circle")
-  .attr("class", "dot")
-  .attr("cx", function (d) {
-    return x(d.x);
-  })
-  .attr("cy", function (d) {
-    return y(d.y);
-  })
-  .attr("r", 2)
-  .on("mouseover", function (d) {
-    div.transition().duration(200).style("opacity", 0.9);
-    div
-      .html(d.x + " " + d.y)
-      .style("left", d3.event.pageX + "px")
-      .style("top", d3.event.pageY - 28 + "px");
-  })
-  .on("mouseout", function (d) {
-    div.transition().duration(0).style("opacity", 0);
-  });
+// .style("filter", "url(#drop-shadow)");
 
 //d3 hoover
 //https://bl.ocks.org/d3noob/a22c42db65eb00d4e369
@@ -258,9 +293,3 @@ g.selectAll(".dot") // plot a circle at each data location
 //     d3.select(this).style("cursor", "");
 //   },
 // });
-
-d3.selectAll("path")
-  .transition() // data transition
-  .style("stroke", "steelblue")
-  .delay(1000)
-  .duration(2000);

@@ -1,13 +1,22 @@
 .line {
   fill: none;
   /* starts invisible, made visible with transition */
-  stroke: green;
+  stroke: white;
   /* half is inside the margin, half is outside */
-  stroke-width: 1px;
+  stroke-width: 3px;
+  stroke-opacity: 0.1;
+}
+
+.dot {
+  fill: yellow;
+  r: 1;
+  stroke: white;
+  stroke-opacity: 0.1;
+  stroke-width: 10;
 }
 
 rect {
-  fill: none;
+  fill: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(0, 212, 255, 1) 100%);
   stroke: black;
   /* half is inside the margin, half is outside */
   stroke-width: 1px;
@@ -15,7 +24,7 @@ rect {
 
 .axis path,
 .axis line {
-  fill: none;
+  fill: gray;
   stroke: #000;
   shape-rendering: crispEdges;
 }

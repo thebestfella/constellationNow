@@ -2083,3 +2083,27 @@ let fullData = [
     },
   },
 ];
+
+let fullDataName = [];
+let fullDataClean = [];
+let fullDataFlat = [];
+let fullDataFlatByID = [];
+
+fullData.forEach((i) => {
+  let a = [];
+  i.geometry.coordinates.forEach((j) => {
+    let b = [];
+    j.forEach((k) => {
+      b.push({ x: -k[0], y: k[1] });
+      fullDataFlatByID.push(i.id);
+      fullDataFlat.push({ x: -k[0], y: k[1] });
+    });
+    //console.log(j);
+    a.push(b);
+  });
+  //get flat data and ID
+  fullDataName.push(i.id);
+  //get clean data but not flat
+  fullDataClean.push({ id: i.id, data: a });
+});
+//fullDataFlatByID = fullDataFlat.slice(1, 100);
