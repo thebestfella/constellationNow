@@ -9,11 +9,17 @@
 //  [x]background
 //  [x]line color
 //  [x]hoover animation
-//  [ ]add class list when point hoover over
-//[ ]work on global roate screen to deal with "Hya"
+//  [ ]add real name when point hoover over
+//[x]deal with "Hya"
 //[ ]rotate with keyboard
 //[ ]click sound
-//[ ]add cht name
+//[x]remve cht name
+//[ ]remove y axis
+//[ ]display double x axis
+//[ ]display grid??
+//[ ]zoom in
+//  [ ]button zoom in
+//  [ ]all buttons
 
 //check api
 //https://ofrohn.github.io/celestial-demo/viewer.html
@@ -24,19 +30,28 @@
 //simple xy
 //http://bl.ocks.org/pbogden/7562151/681d8b7fe71fc79c72e6ab206344c09d893a2f60
 
+let buttonIn = document.querySelector(".buttonIn");
+let buttonOut = document.querySelector(".buttonOut");
+buttonIn.addEventListener("click", zoomIn);
+buttonOut.addEventListener("click", zoomOut);
+
+function zoomIn(e) {}
+
+function zoomOut(e) {}
+
 // Define the div for the tooltip
 var div = d3
-  .select("body")
+  .select(".d3Area")
   .append("div")
   .attr("class", "tooltip")
   .style("opacity", 0);
 
-let size = 6;
+let size = 3;
 
 var outerWidth = 360 * size,
-  outerHeight = 220 * size; // includes margins
+  outerHeight = 180 * size; // includes margins
 
-var margin = { top: 100, right: 20, bottom: 80, left: 80 }; // clockwise as in CSS
+var margin = { top: 30, right: 0, bottom: 50, left: 0 }; // clockwise as in CSS
 
 var width = outerWidth - margin.left - margin.right, // width of plot inside margins
   height = outerHeight - margin.top - margin.bottom; // height   "     "
@@ -50,19 +65,19 @@ function yValue(d) {
   return d.y;
 }
 
-var x = d3.scale
-  .linear() // interpolator for X axis -- inner plot region
+var x = d3
+  .scaleLinear() // interpolator for X axis -- inner plot region
   //.domain(d3.extent(fullDataFlat, xValue))
-  .domain([-220, 190])
+  .domain([-230, 230])
   .range([0, width]);
 
-var y = d3.scale
-  .linear() // interpolator for Y axis -- inner plot region
+var y = d3
+  .scaleLinear() // interpolator for Y axis -- inner plot region
   //.domain(d3.extent(fullDataFlat, yValue))
-  .domain([-90, 90])
+  .domain([-100, 100])
   .range([height, 0]); // remember, (0,0) is upper left -- this reverses "y"
 
-var line = d3.svg
+var line = d3
   .line() // SVG line generator
   .x(function (d) {
     return x(d.x);
@@ -71,23 +86,17 @@ var line = d3.svg
     return y(d.y);
   });
 
-var xAxis = d3.svg
-  .axis() // x Axis
-  .scale(x)
-  .ticks(9) // request 5 ticks on the x axis
-  .orient("bottom");
+var xAxis = d3.axisBottom(x);
 
-var yAxis = d3.svg
-  .axis() // y Axis
-  .scale(y)
-  .ticks(6)
-  .orient("left");
+var yAxis = d3.axisLeft(y);
 
 var svg = d3
-  .select("body")
+  .select(".d3Area")
   .append("svg")
   .attr("width", outerWidth)
   .attr("height", outerHeight); // Note: ok to leave this without units, implied "px"
+
+d3.select(".d3Area").attr("align", "center");
 
 var g = svg
   .append("g") // <g> element is the inner plot area (i.e., inside the margins)
@@ -102,19 +111,11 @@ g.append("g") // render the X axis in the inner plot area
   .attr("transform", "translate(0," + height + ")") // axis runs along lower part of graph
   .call(xAxis);
 
-g.append("text") // plot title
-  .attr("class", "x label")
-  .attr("text-anchor", "middle")
-  .attr("x", width / 2)
-  .attr("y", -margin.top / 2)
-  .attr("dy", "+.75em")
-  .text("plot title");
-
 g.append("rect") // plot a rectangle that encloses the inner plot area
   .attr("width", width)
   .attr("width", width)
   .attr("height", height);
-// .attr("fill", "pink");
+// .attr("fill", none);
 
 fullDataClean.forEach((item) => {
   item.data.forEach((j) => {
@@ -152,6 +153,8 @@ g.selectAll(".dot") // plot a circle at each data location
   .data(fullDataFlat)
   .enter()
   .append("circle")
+  .attr("r", (d, i) => (i % 3) + 1)
+  .attr("stroke-width", (d, i) => 4 * (i % 3) + 3)
   .attr("class", (d, i) => {
     return "dot " + fullDataFlatByID[i];
   })
@@ -241,6 +244,14 @@ g.selectAll(".dot") // plot a circle at each data location
 //   .attr("x", width / 2)
 //   .attr("y", height + (2 * margin.bottom) / 3 + 6)
 //   .text("outer x-axis label");
+
+// g.append("text") // plot title
+//   .attr("class", "x label")
+//   .attr("text-anchor", "middle")
+//   .attr("x", width / 2)
+//   .attr("y", -margin.top / 2)
+//   .attr("dy", "+.75em")
+//   .text("plot title");
 
 // g.append("text") // inner y-axis label
 //   .attr("class", "y label")

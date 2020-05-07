@@ -9,22 +9,49 @@
 
 .dot {
   fill: yellow;
-  r: 1;
   stroke: white;
   stroke-opacity: 0.1;
-  stroke-width: 10;
+}
+
+.d3Area {
+  background: #0f2027;
+  background: -webkit-linear-gradient(to right, #2c5364, #203a43, #0f2027);
+  background: linear-gradient(to right, #2c5364, #203a43, #0f2027);
+}
+
+.buttonArea {
+  display: flex;
+  justify-content: center;
+  background: #a46237;
+  background: -webkit-linear-gradient(to right, #3b4371, #a46237);
+  background: linear-gradient(to right, #3b4371, #a46237);
+}
+
+body {
+  background: #355c7d;
+  background: -webkit-linear-gradient(to right, #c06c84, #6c5b7b, #355c7d);
+  background: linear-gradient(to right, #c06c84, #6c5b7b, #355c7d);
+
+  /* background: #a46237;
+  background: -webkit-linear-gradient(to right, #3b4371, #a46237);
+  background: linear-gradient(to right, #3b4371, #93552d); */
+
+  /* background: #0f2027;
+  background: -webkit-linear-gradient(to right, #2c5364, #203a43, #0f2027);
+  background: linear-gradient(to right, #2c5364, #203a43, #0f2027); */
 }
 
 rect {
   fill: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(0, 212, 255, 1) 100%);
-  stroke: black;
+  fill-opacity: 0;
+  /* stroke: pink; */
   /* half is inside the margin, half is outside */
   stroke-width: 1px;
 }
 
 .axis path,
 .axis line {
-  fill: gray;
+  fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
