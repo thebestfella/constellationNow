@@ -1,15 +1,18 @@
 //theBestFella
 //05/06/2020
 
-//figure out how to read the json
-
-//read json
-
-//get the right coord
-
-//plot
-
-//css
+//[ ]figure out how to read the json
+//[ ]read json
+//[x]get the right coord
+//[x]plot
+//[ ]css
+//  [ ]background
+//  [ ]line color
+//  [ ]hoover animation
+//[ ]work on global roate screen to deal with "Hya"
+//[ ]rotate with keyboard
+//[ ]click sound
+//
 
 // Define the div for the tooltip
 var div = d3
