@@ -2088,15 +2088,32 @@ let fullDataName = [];
 let fullDataClean = [];
 let fullDataFlat = [];
 let fullDataFlatByID = [];
+let rangeByID = {};
 
+//zodiac level
 fullData.forEach((i) => {
   let a = [];
+  let range = {
+    xMax: -Infinity,
+    xMin: Infinity,
+    yMax: -Infinity,
+    yMin: Infinity,
+  };
+
+  //line group level
   i.geometry.coordinates.forEach((j) => {
     let b = [];
+
+    //point level
     j.forEach((k) => {
       b.push({ x: -k[0], y: k[1] });
       fullDataFlatByID.push(i.id);
       fullDataFlat.push({ x: -k[0], y: k[1] });
+
+      if (-k[0] > range.xMax) range.xMax = -k[0];
+      if (-k[0] < range.xMin) range.xMin = -k[0];
+      if (k[1] > range.yMax) range.yMax = k[1];
+      if (k[1] < range.yMin) range.yMin = k[1];
     });
     //console.log(j);
     a.push(b);
@@ -2105,5 +2122,8 @@ fullData.forEach((i) => {
   fullDataName.push(i.id);
   //get clean data but not flat
   fullDataClean.push({ id: i.id, data: a });
+
+  //console.log((range.xMax - range.xMin) * (range.yMax - range.yMin));
+  rangeByID[i.id] = range;
 });
 //fullDataFlatByID = fullDataFlat.slice(1, 100);

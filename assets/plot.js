@@ -17,9 +17,9 @@
 //[ ]remove y axis
 //[ ]display double x axis
 //[ ]display grid??
-//[ ]zoom in
-//  [ ]button zoom in
-//  [ ]all buttons
+//[x]zoom in
+//  [x]button zoom in
+//  [x]all buttons
 
 //check api
 //https://ofrohn.github.io/celestial-demo/viewer.html
@@ -34,15 +34,36 @@
 //https://bl.ocks.org/guilhermesimoes/15ed216d14175d8165e6
 
 let zoomAnimation = 2000; //ms
+let zoomInBorder = 5;
 
-let buttonIn = document.querySelector(".buttonIn");
-let buttonOut = document.querySelector(".buttonOut");
-buttonIn.addEventListener("click", zoomIn);
-buttonOut.addEventListener("click", zoomOut);
+let buttons = document.querySelectorAll(".zodiac");
+let buttonReset = document.querySelector(".reset");
+buttons.forEach((button) => button.addEventListener("click", zoomIn));
+buttonReset.addEventListener("click", zoomOut);
+
+function dotSize(i, sel = false) {
+  let base = i % 3;
+  return sel ? base + 3 : base + 1;
+}
+
+function dotStrokeSize(i, sel = false) {
+  let base = (i % 3) + 3;
+  return sel ? 4 * base : 3 * base;
+}
 
 function zoomIn(e) {
-  let scaleX = d3.scaleLinear().domain([-50, 50]).range([0, width]);
-  let scaleY = d3.scaleLinear().domain([-40, 40]).range([height, 0]);
+  console.log(this.dataset.id);
+  //console.log(rangeByID["Aqr"]);
+  let r = rangeByID[this.dataset.id];
+  let z = zoomInBorder;
+  let scaleX = d3
+    .scaleLinear()
+    .domain([r.xMin - z, r.xMax + z])
+    .range([0, width]);
+  let scaleY = d3
+    .scaleLinear()
+    .domain([r.yMin - z, r.yMax + z])
+    .range([height, 0]);
 
   domXAxis.transition().duration(zoomAnimation).call(d3.axisBottom(scaleX));
   // .duration(this.animationDuration)
@@ -50,10 +71,50 @@ function zoomIn(e) {
   // .duration(this.animationDuration)
 
   dots
+    .classed("sel", (d, i) => fullDataFlatByID[i] === this.dataset.id)
+    .classed("noSel", (d, i) => fullDataFlatByID[i] !== this.dataset.id)
     .transition()
-    .duration(zoomAnimation)
     .attr("cx", (d) => scaleX(d.x))
-    .attr("cy", (d) => scaleY(d.y));
+    .attr("cy", (d) => scaleY(d.y))
+    .attr("r", (d, i) => dotSize(i, fullDataFlatByID[i] === this.dataset.id))
+    .attr("stroke-width", (d, i) =>
+      dotStrokeSize(i, fullDataFlatByID[i] === this.dataset.id)
+    )
+    .style("display", (d, i) => {
+      return fullDataFlatByID[i] === this.dataset.id ? "block" : "none";
+    })
+    .duration(zoomAnimation);
+
+  dots
+    .transition()
+    .style("display", "block")
+    .delay(zoomAnimation)
+    .duration(zoomAnimation);
+
+  let newline = d3
+    .line()
+    .x((d) => scaleX(d.x))
+    .y((d) => scaleY(d.y));
+
+  document.querySelectorAll("path").forEach((z) => {
+    z.parentNode.removeChild(z);
+  });
+
+  fullDataClean.forEach((item) => {
+    let disp = item.id === this.dataset.id;
+    item.data.forEach((j) => {
+      g.append("path") // plot the data as a line
+        .attr("d", newline(j))
+        .attr("class", disp ? "line select" : "line")
+        .style("display", "none")
+        .attr("data-id", item.id);
+    });
+  });
+  d3.selectAll("path")
+    .transition() // data transition
+    .style("display", "block")
+    .delay(zoomAnimation)
+    .duration(zoomAnimation);
 }
 
 function zoomOut(e) {
@@ -66,10 +127,33 @@ function zoomOut(e) {
   // .duration(this.animationDuration)
 
   dots
+
+    .classed("sel", false)
+    .classed("noSel", false)
     .transition()
     .duration(zoomAnimation)
     .attr("cx", (d) => scaleX(d.x))
-    .attr("cy", (d) => scaleY(d.y));
+    .attr("cy", (d) => scaleY(d.y))
+    .attr("r", (d, i) => dotSize(i))
+    .attr("stroke-width", (d, i) => dotStrokeSize(i));
+
+  document.querySelectorAll("path").forEach((z) => {
+    z.parentNode.removeChild(z);
+  });
+
+  fullDataClean.forEach((item) => {
+    item.data.forEach((j) => {
+      g.append("path") // plot the data as a line
+        .attr("d", line(j))
+        .attr("class", "line")
+        .style("display", "none");
+    });
+  });
+  d3.selectAll("path")
+    .transition() // data transition
+    .style("display", "block")
+    .delay(zoomAnimation)
+    .duration(zoomAnimation);
 }
 
 // Define the div for the tooltip
@@ -82,7 +166,7 @@ var div = d3
 let size = 3;
 
 var outerWidth = 360 * size,
-  outerHeight = 180 * size; // includes margins
+  outerHeight = 200 * size; // includes margins
 
 var margin = { top: 30, right: 0, bottom: 50, left: 0 }; // clockwise as in CSS
 
@@ -97,14 +181,6 @@ function xValue(d) {
 function yValue(d) {
   return d.y;
 }
-var line = d3
-  .line() // SVG line generator
-  .x(function (d) {
-    return x(d.x);
-  })
-  .y(function (d) {
-    return y(d.y);
-  });
 
 console.log(x);
 
@@ -148,38 +224,53 @@ g.append("rect") // plot a rectangle that encloses the inner plot area
   .attr("height", height);
 // .attr("fill", none);
 
-//all line
+let line = d3
+  .line()
+  .x((d) => x(d.x))
+  .y((d) => y(d.y));
+
 fullDataClean.forEach((item) => {
   item.data.forEach((j) => {
     g.append("path") // plot the data as a line
-      .datum(j)
-      .attr("class", (d, i) => {
-        return "line " + item.id;
-      })
-      .attr("d", line)
-      .attr("data-id", item.id)
-      .on("mouseover", function (d) {
-        console.log(this.dataset.id);
-        d3.selectAll("." + this.dataset.id)
-          .style("stroke", "salmon")
-          .style("stroke-opacity", "0.5");
-        div.transition().duration(200).style("opacity", 0.9);
-        div
-          //.html(d.x + " no " + d.y)
-          .html(this.dataset.id + " " + "fullname")
-          .style("left", d3.event.pageX + "px")
-          .style("top", d3.event.pageY - 28 + "px");
-      })
-      .on("mouseout", function (d) {
-        d3.selectAll("." + this.dataset.id)
-          .transition()
-          .style("stroke", "white")
-          .style("stroke-opacity", "0.1")
-          .duration(700);
-        div.transition().duration(0).style("opacity", 0);
-      });
+      .attr("d", line(j))
+      .attr("class", "line");
   });
 });
+let lines = g.selectAll(".line");
+
+//all line
+// fullDataClean.forEach((item) => {
+//   item.data.forEach((j) => {
+//     g.append("path") // plot the data as a line
+//       .datum(j)
+//       .attr("class", (d, i) => {
+//         return "line " + item.id;
+//       })
+//       .attr("d", line)
+//       .attr("data-id", item.id)
+//       .on("mouseover", function (d) {
+//         console.log(this.dataset.id);
+//         d3.selectAll("." + this.dataset.id)
+//           .style("stroke", "salmon")
+//           .style("stroke-opacity", "0.5");
+//         div.transition().duration(200).style("opacity", 0.9);
+//         div
+//           //.html(d.x + " no " + d.y)
+//           .html(this.dataset.id + " " + "fullname")
+//           .style("left", d3.event.pageX + "px")
+//           .style("top", d3.event.pageY - 28 + "px");
+//       })
+//       .on("mouseout", function (d) {
+//         d3.selectAll("." + this.dataset.id)
+//           .transition()
+//           .style("stroke", "white")
+//           .style("stroke-opacity", "0.1")
+//           .duration(700);
+//         div.transition().duration(0).style("opacity", 0);
+//       });
+//   });
+// });
+// let lines = g.selectAll(".line");
 
 //all dots
 let dots = g
@@ -187,14 +278,13 @@ let dots = g
   .data(fullDataFlat)
   .enter()
   .append("circle")
-  .attr("r", (d, i) => (i % 3) + 1)
-  .attr("stroke-width", (d, i) => 4 * (i % 3) + 3)
+  .attr("r", (d, i) => dotSize(i))
+  .attr("stroke-width", (d, i) => dotStrokeSize(i))
   .attr("class", (d, i) => "dot " + fullDataFlatByID[i])
   .attr("data-id", (d, i) => fullDataFlatByID[i])
   .attr("cx", (d) => x(d.x))
   .attr("cy", (d) => y(d.y))
   .on("mouseover", function (d) {
-    //console.log(this.dataset.id);
     d3.selectAll("." + this.dataset.id)
       .style("stroke", "salmon")
       .style("stroke-opacity", "0.5");

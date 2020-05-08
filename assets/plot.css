@@ -2,34 +2,57 @@
   fill: none;
   /* starts invisible, made visible with transition */
   stroke: white;
-  /* half is inside the margin, half is outside */
   stroke-width: 3px;
-  stroke-opacity: 0.1;
+  stroke-opacity: 0.05;
+}
+
+.line.select {
+  stroke: salmon;
+  stroke-width: 4px;
+  stroke-opacity: 0.5;
 }
 
 .dot {
   fill: yellow;
+  opacity: 1;
   stroke: white;
   stroke-opacity: 0.1;
 }
 
+.dot.sel {
+  fill: salmon;
+  opacity: 1;
+  stroke: white;
+  stroke-opacity: 0.2;
+}
+.dot.noSel {
+  fill: yellow;
+  opacity: 0.5;
+  stroke: white;
+  stroke-opacity: 0.05;
+}
+
 .d3Area {
-  background: #0f2027;
-  background: -webkit-linear-gradient(to right, #2c5364, #203a43, #0f2027);
-  background: linear-gradient(to right, #2c5364, #203a43, #0f2027);
+  background-color: #000000;
+  background-image: linear-gradient(170deg, #000000, #2d3436, #000000 74%);
+  /* background-image: linear-gradient(60deg, #29323c 0%, #485563 100%); */
+  /* background: #0f2027;
+  background: linear-gradient(to right, #2c5364, #203a43, #0f2027); */
+  /* background-image: url("park.jpg");
+  background-color: #0f2027;
+  background-position: center;
+  background-size: cover; */
 }
 
 .buttonArea {
   display: flex;
   justify-content: center;
   background: #a46237;
-  background: -webkit-linear-gradient(to right, #3b4371, #a46237);
   background: linear-gradient(to right, #3b4371, #a46237);
 }
 
 body {
   background: #355c7d;
-  background: -webkit-linear-gradient(to right, #c06c84, #6c5b7b, #355c7d);
   background: linear-gradient(to right, #c06c84, #6c5b7b, #355c7d);
 
   /* background: #a46237;
@@ -42,8 +65,8 @@ body {
 }
 
 rect {
-  fill: linear-gradient(90deg, rgba(2, 0, 36, 1) 0%, rgba(0, 212, 255, 1) 100%);
-  fill-opacity: 0;
+  fill: linear-gradient(170deg, #000000, #2d3436, #000000 74%);
+  fill-opacity: 0.3;
   /* stroke: pink; */
   /* half is inside the margin, half is outside */
   stroke-width: 1px;
@@ -67,4 +90,83 @@ div.tooltip {
   border: 0px;
   border-radius: 8px;
   pointer-events: none;
+}
+
+.button {
+  position: relative;
+  width: 220px;
+  height: 40px;
+  text-align: center;
+  color: #fff;
+  text-decoration: none;
+  line-height: 43px;
+  font-family: "Oswald", Helvetica;
+  display: block;
+  margin: 10px;
+}
+.button:before {
+  background: #f0f0f0;
+  background-image: -webkit-gradient(
+    linear,
+    0% 0%,
+    0% 100%,
+    from(#d0d0d0),
+    to(#f0f0f0)
+  );
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) inset, 0 1px 0 #fff;
+
+  position: absolute;
+  content: "";
+  left: -6px;
+  right: -6px;
+  top: -6px;
+  bottom: -10px;
+  z-index: -1;
+}
+
+.button:active {
+  -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.1) inset;
+  top: 5px;
+}
+.button:active:before {
+  top: -11px;
+  bottom: -5px;
+  content: "";
+}
+
+.reset {
+  text-shadow: -1px -1px 0 #a84155;
+  background: #d25068;
+  border: 1px solid #d25068;
+  background-image: linear-gradient(to bottom, #f66c7b, #d25068);
+
+  border-radius: 5px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.1) inset, 0 4px 0 #ad4257,
+    0 4px 2px rgba(0, 0, 0, 0.5);
+}
+
+.reset:hover {
+  background: #f66c7b;
+  background-image: linear-gradient(top, #d25068, #f66c7b);
+}
+
+.zodiac {
+  text-shadow: -1px -1px 0 #2c7982;
+  background: #3eacba;
+  border: 1px solid #379aa4;
+  background-image: linear-gradient(top, #48c6d4, #3eacba);
+
+  border-radius: 5px;
+
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.1) inset, 0 4px 0 #338a94,
+    0 4px 2px rgba(0, 0, 0, 0.5);
+}
+
+.zodiac:hover {
+  background: #48c6d4;
+  background-image: linear-gradient(top, #3eacba, #48c6d4);
 }
